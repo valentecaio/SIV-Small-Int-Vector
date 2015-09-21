@@ -5,6 +5,18 @@
 #include "smallint.h"
 #include <stdio.h>
 #include <math.h>
+#define FLOWSIZE 32
+
+// verifica se um inteiro é overflow e retorna 1 se sim
+int overflow (int a) {
+        return ( a>(FLOWSIZE-1) || a< -FLOWSIZE )
+}
+
+// colocar o boolean do overflow do vetor
+setOverflow (int index, int status, int *v) {
+        v[i]=status;
+}
+
 
 VetSmallInt vs_new(int val[])
 {
