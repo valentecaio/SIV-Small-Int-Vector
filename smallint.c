@@ -100,3 +100,21 @@ void vs_print(VetSmallInt v) {
 		printf("\t%d (%02x)", x, x);
 	}
 }
+
+VetSmallInt vs_add(VetSmallInt v1, VetSmallInt v2)
+{
+	int i, x, y;
+	int v[4];
+	VetSmallInt siv;
+	
+	for (i=0; i<4; i++) 
+	{
+		x = getCastedToInt (v, i);
+		y = getCastedToInt (v,i);
+		v[i] = x+y;
+	}
+	
+	siv = vs_new(v);
+	
+	return siv;
+}
