@@ -109,8 +109,8 @@ VetSmallInt vs_add(VetSmallInt v1, VetSmallInt v2)
 	
 	for (i=0; i<4; i++) 
 	{
-		x = getCastedToInt (v, i);
-		y = getCastedToInt (v,i);
+		x = getCastedToInt (v1,i);
+		y = getCastedToInt (v2,i);
 		v[i] = x+y;
 	}
 	
