@@ -63,6 +63,7 @@ VetSmallInt vs_new(int val[]) {
 // pega o small int do indice index e devolve como signed int
 int getCastedToInt (VetSmallInt v, int index) {
 	int x,a;
+	/*
 	if (i==0)
 		x = v & 0xF8000000; // 11111000000000000000000000000000
 	else if (i==1)
@@ -71,6 +72,11 @@ int getCastedToInt (VetSmallInt v, int index) {
 		x = v & 0x000F8000; // 00000000000011111000000000000000
 	else if (i==3)
 		x = v & 0x00003E00; // 00000000000000000011111000000000
+	*/
+	// as duas linhas abaixo resumem o comentario acima
+	x = (0xF8000000 >> (i*6));
+	x = (x & v);
+	
 	a = 5+(index*6); // calcula qual bit é o complemento a 2 desse small int
 	if (1<<a & v) // (1<<a) equivale a (pow (2,a))
 		x = -x;
