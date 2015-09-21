@@ -118,3 +118,23 @@ VetSmallInt vs_add(VetSmallInt v1, VetSmallInt v2)
 	
 	return siv;
 }
+
+VetSmallInt vs_shl(VetSmallInt v, int n)
+{
+	int i, x, y;
+	int v[4];
+	VetSmallInt siv;
+	
+	for (i=0; i<4; i++)
+	{
+		x = getCastedToInt(v,i);
+		y = x << n;
+		v[i] = y;
+	}
+	
+	siv = vs_new(v);
+	siv = (siv & 0x0FFFFFFF);	
+	
+	return siv;
+	
+}
