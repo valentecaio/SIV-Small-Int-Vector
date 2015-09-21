@@ -15,7 +15,7 @@ int overflow (int a) {
 }
 
 // coloca o boolean de overflow de um determinado indice do vetor no respectivo bit do SIV
-setOverflow (int index, int status, VetSmallInt *v) {
+void setOverflow (int index, int status, VetSmallInt *v) {
 	int bitOfOverflow, overflowInbinary, i;
 	if (status) {
 		bitOfOverflow = VECTORSIZE - (index+1); // calcula o numero do bit que deve ser sobrescrito
@@ -25,23 +25,36 @@ setOverflow (int index, int status, VetSmallInt *v) {
 }
 
 // preenche os bits 24 a 27 com zeros (e nao altera os outros)
-fillWithZeros (VetSmallInt *a) {
+void fillWithZeros (VetSmallInt *a) {
 	*a = (*a & 0xFFFFFF0F);	
 }
 
-VetSmallInt vs_new(int val[])
-{
-        int i, n;
+// coloca um inteiro x em uma entrada index do VetSmallInt 
+void intToSmallInt (int index, int x, VetSmallInt *v) {
+	// trunca o valor caso haja overflow
+	while (overflow(x)) {
+		x -= FLOWSIZE;
+	}
+	
+	// anda com o x o numero de bits do index
+	x << index*6; // acho que é o mesmo que ( x += index*FLOWSIZE )
+	*v = (*v | x);
+}
+
+VetSmallInt vs_new(int val[]) {
+	int i;
 	VetSmallInt siv; // é o vetor de pequenos inteiros
 	
 	// preenche os bits 24 a 27
 	fillWithZeros(&siv);
 	
 	// configura os overflow nos bits 28 a 31
-	for (i = 0; i<4; i++)
+	for (i=0; i<4; i++)
 		setOverflow(i, overflow(val[i]), &siv);
-	
-	
+
+	// converte os inteiros e os coloca no SIV
+	for (i=0; i<4; i++)
+		intToSmallInt (i, val[i], &siv);
 	
 	return siv;
 }
