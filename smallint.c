@@ -14,6 +14,17 @@ int overflow (int a) {
 	return ( a>(FLOWSIZE-1) || a< -FLOWSIZE )
 }
 
+// retorna o bit do respectivo overflow de um small-int em determinado indice
+ int bitOfOverflow (int i) {
+	 return 5+(i*6);
+ }
+ 
+ // retorna o bit do respectivo complemento a2 de um small-int em determinado indice
+ int bitOfComplementoA2 (int i) {
+	 return 4+(i*6);
+	 
+ }
+ 
 // coloca o boolean de overflow de um determinado indice do vetor no respectivo bit do SIV
 void setOverflow (int index, int status, VetSmallInt *v) {
 	int bitOfOverflow, overflowInbinary, i;
@@ -29,11 +40,25 @@ void fillWithZeros (VetSmallInt *a) {
 	*a = (*a & 0xFFFFFF0F);	
 }
 
+
 // coloca um inteiro x em uma entrada index do VetSmallInt 
 void pushToSmallIntVector (int index, int x, VetSmallInt *v) {
+	int a;
+	
+	// pega o modulo de x
+	int negative = (x<0);
+	if (negative)
+		x = -x;
+	
 	// trunca o valor caso haja overflow
 	while (overflow(x)) {
 		x -= FLOWSIZE;
+	}
+	
+	// se for negativo, altera o bit do complemento a2
+	if (negative) {
+		a = indexOfOverflowBit(index);
+		*v = *v | (1<<a)
 	}
 	
 	// anda com o x o numero de bits do index
@@ -53,7 +78,6 @@ VetSmallInt vs_new(int val[]) {
 		setOverflow(i, overflow(val[i]), &siv);
 
 	// converte os inteiros e os coloca no SIV
-	// essa parte ta errada pq nao ta considerando o complemento a 2
 	for (i=0; i<4; i++)
 		pushToSmallIntVector (i, val[i], &siv);
 	
@@ -64,20 +88,20 @@ VetSmallInt vs_new(int val[]) {
 int getCastedToInt (VetSmallInt v, int index) {
 	int x,a;
 	/*
-	if (i==0)
+	if (index==0)
 		x = v & 0xF8000000; // 11111000000000000000000000000000
-	else if (i==1)
+	else if (index==1)
 		x = v & 0x03E00000; // 00000011111000000000000000000000
-	else if (i==2)
+	else if (index==2)
 		x = v & 0x000F8000; // 00000000000011111000000000000000
-	else if (i==3)
+	else if (index==3)
 		x = v & 0x00003E00; // 00000000000000000011111000000000
 	*/
 	// as duas linhas abaixo resumem o comentario acima
-	x = (0xF8000000 >> (i*6));
+	x = (0xF8000000 >> (i*6)); // 0xF8000000 === 11111000000000000000000000000000
 	x = (x & v);
 	
-	a = 5+(index*6); // calcula qual bit é o complemento a 2 desse small int
+	a = bitOfOverflow(index); // calcula qual bit é o complemento a 2 desse small int
 	if (1<<a & v) // (1<<a) equivale a (pow (2,a))
 		x = -x;
 	return x;
@@ -101,6 +125,7 @@ void vs_print(VetSmallInt v) {
 	}
 }
 
+
 VetSmallInt vs_add(VetSmallInt v1, VetSmallInt v2)
 {
 	int i, x, y;
@@ -118,3 +143,5 @@ VetSmallInt vs_add(VetSmallInt v1, VetSmallInt v2)
 	
 	return siv;
 }
+
+
