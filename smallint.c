@@ -10,14 +10,17 @@
 typedef unsigned VetSmallInt;
 
 // verifica se um inteiro vai truncar na conversao e retorna 1 se sim
-int overflow (int a) {
+int overflow (int a) 
+{
 	return ( a>(FLOWSIZE-1) || a< -FLOWSIZE )
 }
 
 // coloca o boolean de overflow de um determinado indice do vetor no respectivo bit do SIV
-void setOverflow (int index, int status, VetSmallInt *v) {
+void setOverflow (int index, int status, VetSmallInt *v) 
+{
 	int bitOfOverflow, overflowInbinary, i;
-	if (status) {
+	if (status) 
+	{
 		bitOfOverflow = (VECTORSIZE -4) +index; // calcula o numero do bit que deve ser sobrescrito
 		overflowInbinary = (1<<bitOfOverflow); // gera um numero binario com apenas um bit true (igual a 1)
 		v = (v | overflowInbinary);
@@ -25,14 +28,17 @@ void setOverflow (int index, int status, VetSmallInt *v) {
 }
 
 // preenche os bits 24 a 27 com zeros (e nao altera os outros)
-void fillWithZeros (VetSmallInt *a) {
+void fillWithZeros (VetSmallInt *a) 
+{
 	*a = (*a & 0xFFFFFF0F);	
 }
 
 // coloca um inteiro x em uma entrada index do VetSmallInt 
-void pushToSmallIntVector (int index, int x, VetSmallInt *v) {
+void pushToSmallIntVector (int index, int x, VetSmallInt *v) 
+{
 	// trunca o valor caso haja overflow
-	while (overflow(x)) {
+	while (overflow(x)) 
+	{
 		x -= FLOWSIZE;
 	}
 	
@@ -41,7 +47,8 @@ void pushToSmallIntVector (int index, int x, VetSmallInt *v) {
 	*v = (*v | x);
 }
 
-VetSmallInt vs_new(int val[]) {
+VetSmallInt vs_new(int val[]) 
+{
 	int i;
 	VetSmallInt siv; // é o vetor de pequenos inteiros
 	
@@ -61,7 +68,8 @@ VetSmallInt vs_new(int val[]) {
 }
 
 // pega o small int do indice index e devolve como signed int
-int getCastedToInt (VetSmallInt v, int index) {
+int getCastedToInt (VetSmallInt v, int index) 
+{
 	int x,a;
 	/*
 	if (i==0)
@@ -83,19 +91,23 @@ int getCastedToInt (VetSmallInt v, int index) {
 	return x;
 }
 
-void vs_print(VetSmallInt v) {
+void vs_print(VetSmallInt v) 
+{
 	int i,x;
 	printf ("\n\nOverflow: ");
-	for (i=28; i<31; i++) {
+	for (i=28; i<31; i++) 
+	{
 		// pow(2,i) (o mesmo que 1<<i) so possui um bit true, que eh o bit que vamos filtrar
-		if (1<<i & v) {	// vai ser true somente se o bit i do vetor v for true
+		if (1<<i & v) 
+		{	// vai ser true somente se o bit i do vetor v for true
 			printf ("\tsim");
 		}
 		else
 			printf ("\tnao");
 	}
 	printf ("\nValores: ");
-	for (i=0; i<4; i++) {
+	for (i=0; i<4; i++) 
+	{
 		x = getCastedToInt (v, i);
 		printf("\t%d (%02x)", x, x);
 	}
@@ -117,4 +129,24 @@ VetSmallInt vs_add(VetSmallInt v1, VetSmallInt v2)
 	siv = vs_new(v);
 	
 	return siv;
+}
+
+VetSmallInt vs_shl(VetSmallInt v, int n)
+{
+	int i, x, y;
+	int v[4];
+	VetSmallInt siv;
+	
+	for (i=0; i<4; i++)
+	{
+		x = getCastedToInt(v,i);
+		y = x << n;
+		v[i] = y;
+	}
+	
+	siv = vs_new(v);
+	siv = (siv & 0x0FFFFFFF);	
+	
+	return siv;
+	
 }
