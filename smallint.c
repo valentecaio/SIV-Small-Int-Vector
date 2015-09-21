@@ -29,12 +29,26 @@ void fillWithZeros (VetSmallInt *a) {
 	*a = (*a & 0xFFFFFF0F);	
 }
 
+void deleteFromSmallVector (VetSmallInt *v, int index) {
+	// 11111100000000000000000000000000 === 0xFC000000
+	int filter = 0x03FFFFFF;			// 00000011111111111111111111111111 === 0x03FFFFFF
+	while (index) {
+		filter = filter>>6; 			// empurra 6 bits pra direita
+		filter = filter & 0xFC000000	// preenche os 6 primeiros bits com true
+		index--;
+	}
+	*v = *v & filter;
+}
+
 // coloca um inteiro x em uma entrada index do VetSmallInt 
 void pushToSmallIntVector (int index, int x, VetSmallInt *v) {
 	// trunca o valor caso haja overflow
 	while (overflow(x)) {
 		x -= FLOWSIZE;
 	}
+	
+	// apaga o inteiro antigo antes de colocar o novo
+	deleteFromSmallVector (v, index);
 	
 	// anda com o x o numero de bits do index
 	x << index*6; // é o mesmo que ( x += index*FLOWSIZE )
