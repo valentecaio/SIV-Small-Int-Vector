@@ -6,6 +6,6 @@
 
 VetSmallInt vs_new(int val[])
 {
-
+  printf ("ILANA LINDA");
 }
 
