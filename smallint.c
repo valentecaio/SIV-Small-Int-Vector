@@ -160,9 +160,7 @@ VetSmallInt vs_shr(VetSmallInt v, int n)
 	for (i=0; i<4; i++)
 	{
 		x = getCastedToInt(v,i);
-		if (x<0) {			// se x for negativo
-			x = x & 0x3F;	// preenche tudo a esquerda do bit 6 com False
-		}
+		x = x & 0x3F;	// preenche tudo a esquerda do sexto bit com False (nao altera nada nos positivos)
 		y = x >> n;
 		s[i] = y;
 	}
