@@ -43,7 +43,7 @@ void cleanOverflow (VetSmallInt *a) {
 
 // zera os 6 bits de um determinado indice do SIV
 void deleteFromSmallVector (VetSmallInt *v, int index) {
-	int filter = 0xFFFFFFC0;		// bx 1100 0000
+	int filter = 0xFFFFFFC0;		// 0b 1100 0000
 	while (index) {
 		filter = filter<<6; 		// empurra 6 bits pra esquerda
 		filter = filter | 0x3F		// preenche os 6 primeiros bits com true
