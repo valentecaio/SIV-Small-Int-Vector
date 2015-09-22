@@ -28,7 +28,7 @@ int bitOfComplementoA2 (int i) {
 void setOverflow (int index, int status, VetSmallInt *v) {
 	int overflowInbinary;
 	overflowInbinary = 1<<bitOfOverflow(index); // gera um numero binario com apenas um bit true (igual a 1)
-	if (status) {
+	if (status == true) {
 		*v = (*v | overflowInbinary);
 	} else {
 		overflowInbinary = ~overflowInbinary;	// inverte os bits
@@ -43,10 +43,10 @@ void cleanOverflow (VetSmallInt *a) {
 
 // zera os 6 bits de um determinado indice do SIV
 void deleteFromSmallVector (VetSmallInt *v, int index) {
-	int filter = 0xFFFFFF30;			// 
+	int filter = 0xFFFFFFC0;		// bx 1100 0000
 	while (index) {
-		filter = filter<<6; 			// empurra 6 bits pra direita
-		filter = filter | 0x0000003F	// preenche os 6 primeiros bits com true
+		filter = filter<<6; 		// empurra 6 bits pra esquerda
+		filter = filter | 0x3F		// preenche os 6 primeiros bits com true
 		index--;
 	}
 	*v = *v & filter;
@@ -54,12 +54,13 @@ void deleteFromSmallVector (VetSmallInt *v, int index) {
 
 // coloca um inteiro x em uma entrada index do VetSmallInt 
 void pushToSmallIntVector (int index, int x, VetSmallInt *v) {
-	// trunca o valor caso haja overflow
-	x = (x & 0x3F); // 0x3F é uma mascara que zera tudo a partir do bit 6
 
 	// configura os overflow nos bits 28 a 31
 	setOverflow(index, overflow(x), v);
-	
+
+	// trunca o valor caso haja overflow
+	x = (x & 0x3F); // 0x3F é uma mascara que zera tudo a partir do bit 6
+
 	// apaga o inteiro antigo antes de colocar o novo
 	deleteFromSmallVector (v, index);
 	
@@ -149,33 +150,25 @@ VetSmallInt vs_shl(VetSmallInt v, int n)
 	return siv;
 }
 
+// é o unico shift que da problema, pq o operador de shift >> funciona como aritmetico para signeds
 VetSmallInt vs_shr(VetSmallInt v, int n)
 {
 	int i, x, y;
-	int v[4];
+	int s[4];
 	VetSmallInt siv;
 	
 	for (i=0; i<4; i++)
 	{
-		if(i>=0)
-		{
-			x = getCastedToInt(v, i);
-			y = x >> n;
-			v[i] = y;
+		x = getCastedToInt(v,i);
+		if (x<0) {			// se x for negativo
+			x = x & 0x3F;	// preenche tudo a esquerda do bit 6 com False
 		}
-		
-		else
-		{
-			x = getCastedToInt(v,i);
-			y = x >> n;
-			z = x | 0xF0000000;
-			
-		}
-		
+		y = x >> n;
+		s[i] = y;
 	}
 	
-	siv = vs_new(v);
-	siv = (siv & 0x0FFFFFFF);	
+	siv = vs_new(s);
+	cleanOverflow(&siv);
 	
 	return siv;
 }
@@ -188,16 +181,15 @@ VetSmallInt vs_sar(VetSmallInt v, int n)
 	
 	for (i=0; i<4; i++)
 	{
-		x = getCastedToInt(v, i);
-		y = x >> n;
+		x = getCastedToInt(v,i);
+		y = x >> n; // ja faz shift arimetico por padrao, pq x é signed
 		v[i] = y;
 	}
-		
-	
 	
 	siv = vs_new(v);
-	siv = (siv & 0x0FFFFFFF);	
+	cleanOverflow(&siv);
 	
 	return siv;
 
 }
+
