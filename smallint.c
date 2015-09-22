@@ -149,25 +149,33 @@ VetSmallInt vs_shl(VetSmallInt v, int n)
 	return siv;
 }
 
-// é o unico shift que da problema, pq o operador de shift >> funciona como aritmetico para signeds
 VetSmallInt vs_shr(VetSmallInt v, int n)
 {
 	int i, x, y;
-	int s[4];
+	int v[4];
 	VetSmallInt siv;
 	
 	for (i=0; i<4; i++)
 	{
-		x = getCastedToInt(v,i);
-		if (x<0) {			// se x for negativo
-			x = x & 0x3F;	// preenche tudo a esquerda do bit 6 com False
+		if(i>=0)
+		{
+			x = getCastedToInt(v, i);
+			y = x >> n;
+			v[i] = y;
 		}
-		y = x >> n;
-		s[i] = y;
+		
+		else
+		{
+			x = getCastedToInt(v,i);
+			y = x >> n;
+			z = x | 0xF0000000;
+			
+		}
+		
 	}
 	
-	siv = vs_new(s);
-	cleanOverflow(&siv);
+	siv = vs_new(v);
+	siv = (siv & 0x0FFFFFFF);	
 	
 	return siv;
 }
@@ -180,15 +188,16 @@ VetSmallInt vs_sar(VetSmallInt v, int n)
 	
 	for (i=0; i<4; i++)
 	{
-		x = getCastedToInt(v,i);
-		y = x >> n; // ja faz shift arimetico por padrao, pq x é signed
+		x = getCastedToInt(v, i);
+		y = x >> n;
 		v[i] = y;
 	}
+		
+	
 	
 	siv = vs_new(v);
-	cleanOverflow(&siv);
+	siv = (siv & 0x0FFFFFFF);	
 	
 	return siv;
 
 }
-
