@@ -28,7 +28,7 @@ int bitOfComplementoA2 (int i) {
 void setOverflow (int index, int status, VetSmallInt *v) {
 	int overflowInbinary;
 	overflowInbinary = 1<<bitOfOverflow(index); // gera um numero binario com apenas um bit true (igual a 1)
-	if (status == true) {
+	if (status) {
 		*v = (*v | overflowInbinary);
 	} else {
 		overflowInbinary = ~overflowInbinary;	// inverte os bits
@@ -43,10 +43,10 @@ void cleanOverflow (VetSmallInt *a) {
 
 // zera os 6 bits de um determinado indice do SIV
 void deleteFromSmallVector (VetSmallInt *v, int index) {
-	int filter = 0xFFFFFFC0;		// bx 1100 0000
+	int filter = 0xFFFFFF30;			// 
 	while (index) {
-		filter = filter<<6; 		// empurra 6 bits pra esquerda
-		filter = filter | 0x3F		// preenche os 6 primeiros bits com true
+		filter = filter<<6; 			// empurra 6 bits pra direita
+		filter = filter | 0x0000003F	// preenche os 6 primeiros bits com true
 		index--;
 	}
 	*v = *v & filter;
@@ -54,13 +54,12 @@ void deleteFromSmallVector (VetSmallInt *v, int index) {
 
 // coloca um inteiro x em uma entrada index do VetSmallInt 
 void pushToSmallIntVector (int index, int x, VetSmallInt *v) {
-
-	// configura os overflow nos bits 28 a 31
-	setOverflow(index, overflow(x), v);
-
 	// trunca o valor caso haja overflow
 	x = (x & 0x3F); // 0x3F é uma mascara que zera tudo a partir do bit 6
 
+	// configura os overflow nos bits 28 a 31
+	setOverflow(index, overflow(x), v);
+	
 	// apaga o inteiro antigo antes de colocar o novo
 	deleteFromSmallVector (v, index);
 	
