@@ -14,4 +14,5 @@ int main (void) {
 	printa_vetor(a, VECTORSIZE);
 	VetSmallInt v = vs_new(a);
 	vs_print(v);
+	return 0;
 }

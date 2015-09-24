@@ -11,7 +11,7 @@ typedef unsigned VetSmallInt;
 
 // verifica se um inteiro vai truncar na conversao e retorna 1 se sim
 int overflow (int a) {
-	return ( a>(TOTALSIZE-1) || a< -TOTALSIZE )
+	return ( a>(TOTALSIZE-1) || a< -TOTALSIZE );
 }
 
 // retorna o bit do respectivo overflow de um small-int em determinado indice
@@ -165,7 +165,7 @@ VetSmallInt vs_shr(VetSmallInt v, int n)
 
 VetSmallInt vs_sar(VetSmallInt v, int n)
 {
-	int i, x;
+	int i;
 	int s[VECTORSIZE];
 	VetSmallInt v_shifted;
 	
