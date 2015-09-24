@@ -5,8 +5,7 @@
 #include <stdio.h>
 #include <math.h>
 #define FLOWSIZE 32 // 2^5 é o modulo maximo pra 6 bits signed
-#define VECTORSIZE 32
-
+#define VECTORSIZE 4
 typedef unsigned VetSmallInt;
 
 // verifica se um inteiro vai truncar na conversao e retorna 1 se sim
@@ -16,7 +15,7 @@ int overflow (int a) {
 
 // retorna o bit do respectivo overflow de um small-int em determinado indice
 int bitOfOverflow (int i) {
-	return (FLOWSIZE-4) +i;
+	return (FLOWSIZE- VECTORSIZE) +i;
 }
 
 // retorna o bit do respectivo complemento a2 de um small-int em determinado indice
@@ -78,7 +77,7 @@ VetSmallInt vs_new(int val[]) {
 	
 	// converte os inteiros e os coloca no SIV
 	// essa parte ta errada pq nao ta considerando o complemento a 2
-	for (i=0; i<4; i++)
+	for (i=0; i<VECTORSIZE; i++)
 		pushToSmallIntVector (i, val[i], &siv);
 	
 	return siv;
@@ -108,7 +107,7 @@ void vs_print(VetSmallInt v) {
 		}
 	}
 	printf ("\nValores: ");
-	for (i=0; i<4; i++) {
+	for (i=0; i<VECTORSIZE; i++) {
 		x = getCastedToInt (v, i);
 		printf("\t%d (%02x)", x, x);
 	}
@@ -117,10 +116,10 @@ void vs_print(VetSmallInt v) {
 VetSmallInt vs_add(VetSmallInt v1, VetSmallInt v2)
 {
 	int i, x, y;
-	int v[4];
+	int v[VECTORSIZE];
 	VetSmallInt siv;
 	
-	for (i=0; i<4; i++) 
+	for (i=0; i<VECTORSIZE; i++) 
 	{
 		x = getCastedToInt (v1,i);
 		y = getCastedToInt (v2,i);
@@ -134,10 +133,10 @@ VetSmallInt vs_add(VetSmallInt v1, VetSmallInt v2)
 VetSmallInt vs_shl(VetSmallInt v, int n)
 {
 	int i, x, y;
-	int s[4];
+	int s[VECTORSIZE];
 	VetSmallInt siv;
 	
-	for (i=0; i<4; i++)
+	for (i=0; i<VECTORSIZE; i++)
 	{
 		x = getCastedToInt(v,i);
 		y = x << n;
@@ -154,10 +153,10 @@ VetSmallInt vs_shl(VetSmallInt v, int n)
 VetSmallInt vs_shr(VetSmallInt v, int n)
 {
 	int i, x, y;
-	int s[4];
+	int s[VECTORSIZE];
 	VetSmallInt siv;
 	
-	for (i=0; i<4; i++)
+	for (i=0; i<VECTORSIZE; i++)
 	{
 		x = getCastedToInt(v,i);
 		x = x & 0x3F;	// preenche tudo a esquerda do sexto bit com False (nao altera nada nos positivos)
@@ -174,10 +173,10 @@ VetSmallInt vs_shr(VetSmallInt v, int n)
 VetSmallInt vs_sar(VetSmallInt v, int n)
 {
 	int i, x, y;
-	int v[4];
+	int v[VECTORSIZE];
 	VetSmallInt siv;
 	
-	for (i=0; i<4; i++)
+	for (i=0; i<VECTORSIZE; i++)
 	{
 		x = getCastedToInt(v,i);
 		y = x >> n; // ja faz shift arimetico por padrao, pq x é signed
