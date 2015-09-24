@@ -11,9 +11,23 @@ void printa_vetor (int *a, int n) {
 }
 
 int main (void) {
-	int a[VECTORSIZE] = {4, 10, -20, 60};
+	int a[VECTORSIZE] = {4, 20, -30, 60};
+	int b[VECTORSIZE] = {4, 20, -30, 60};
+	VetSmallInt v;
+	
 	printa_vetor(a, VECTORSIZE);
-	VetSmallInt v = vs_new(a);
+	printa_vetor(b, VECTORSIZE);
+	
+	// teste de criação e print
+	printf ("\n\n------TESTE DE CRIACAO------\n\n");
+	v = vs_new(a);
 	vs_print(v);
+	v = vs_new(b);
+	vs_print(v);
+	
+	printf ("\n\n------TESTE DE SOMA------\n\n");
+	v = vs_add(vs_new(a), vs_new(b));
+	vs_print(v);
+	
 	return 0;
 }
