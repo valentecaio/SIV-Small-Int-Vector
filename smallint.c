@@ -108,7 +108,7 @@ void vs_print(VetSmallInt v) {
 	}
 	printf ("\nValores: ");
 	for (i=0; i<VECTORSIZE; i++) {
-		x = vs_pull (v, i);
+		x = vs_pull (&v, i);
 		printf("\t%d (%02x)", x, x);
 	}
 	printf ("\n\n");
@@ -122,7 +122,7 @@ VetSmallInt vs_add(VetSmallInt v1, VetSmallInt v2)
 	
 	for (i=0; i<VECTORSIZE; i++) 
 	{
-		v[i] = vs_pull (v1,i) + vs_pull (v2,i);
+		v[i] = vs_pull (&v1,i) + vs_pull (&v2,i);
 	}
 	
 	v_add = vs_new(v);
@@ -137,7 +137,7 @@ VetSmallInt vs_shl(VetSmallInt v, int n)
 	
 	for (i=0; i<VECTORSIZE; i++)
 	{
-		s[i] = vs_pull(v,i) << n;
+		s[i] = vs_pull(&v,i) << n;
 	}
 	
 	v_shifted = vs_new(s);
@@ -155,7 +155,7 @@ VetSmallInt vs_shr(VetSmallInt v, int n)
 	
 	for (i=0; i<VECTORSIZE; i++)
 	{	// a mascara 0x3F preenche tudo a esquerda do sexto bit com False (nao altera nada nos positivos)
-		s[i] = (vs_pull(v,i) & 0x3F) >> n;
+		s[i] = (vs_pull(&v,i) & 0x3F) >> n;
 	}
 	
 	v_shifted = vs_new(s);
@@ -172,7 +172,7 @@ VetSmallInt vs_sar(VetSmallInt v, int n)
 	
 	for (i=0; i<VECTORSIZE; i++)
 	{
-		s[i] = vs_pull(v,i) >> n; // ja faz shift arimetico por padrao, pq x é signed 
+		s[i] = vs_pull(&v,i) >> n; // ja faz shift arimetico por padrao, pq x é signed 
 	}
 	
 	v_shifted = vs_new(s);
