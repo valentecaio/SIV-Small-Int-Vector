@@ -98,7 +98,7 @@ VetSmallInt vs_new(int val[]) {
 
 void vs_print(VetSmallInt v) {
 	int i,x;
-	printf ("\nExbindo dados do vetor de pequenos inteiros: \n\nOverflow: ");
+	printf ("\n\nExibindo dados do vetor de pequenos inteiros: \n\nOverflow: ");
 	for (i=TOTALSIZE-VECTORSIZE; i<TOTALSIZE; i++) {
 		if (1<<i & v) {	// vai ser true somente se o bit i do vetor v for true
 			printf ("\tsim");
@@ -111,6 +111,7 @@ void vs_print(VetSmallInt v) {
 		x = getCastedToInt (v, i);
 		printf("\t%d (%02x)", x, x);
 	}
+	printf ("\n\n");
 }
 
 VetSmallInt vs_add(VetSmallInt v1, VetSmallInt v2)

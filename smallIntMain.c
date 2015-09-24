@@ -3,10 +3,11 @@
 #define VECTORSIZE 4
 void printa_vetor (int *a, int n) {
 	int i;
-	printf ("\nPrintando dados do vetor de inteiros:\n");
+	printf ("\nExibindo dados do vetor de inteiros:\n");
 	for (i=0; i<n; i++) {
 		printf ("\nentrada %d \t valor: %d", i, a[i]);
-	}	
+	}
+	printf ("\n");
 }
 
 int main (void) {
