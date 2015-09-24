@@ -85,10 +85,7 @@ int getCastedToInt (VetSmallInt v, int index) {
 VetSmallInt vs_new(int val[]) {
 	int i;
 	VetSmallInt siv; // é o vetor de pequenos inteiros
-	
-	// preenche os bits 24 a 27
-	fillWithZeros(&siv);
-	
+		
 	// converte os inteiros e os coloca no SIV
 	// essa parte ta errada pq nao ta considerando o complemento a 2
 	for (i=0; i<VECTORSIZE; i++)
@@ -116,78 +113,69 @@ void vs_print(VetSmallInt v) {
 
 VetSmallInt vs_add(VetSmallInt v1, VetSmallInt v2)
 {
-	int i, x, y;
+	int i;
 	int v[VECTORSIZE];
-	VetSmallInt siv;
+	VetSmallInt v_add;
 	
 	for (i=0; i<VECTORSIZE; i++) 
 	{
-		x = getCastedToInt (v1,i);
-		y = getCastedToInt (v2,i);
-		v[i] = x+y;
+		v[i] = getCastedToInt (v1,i) + getCastedToInt (v2,i);
 	}
 	
-	siv = vs_new(v);
-	return siv;
+	v_add = vs_new(v);
+	return v_add;
 }
 
 VetSmallInt vs_shl(VetSmallInt v, int n)
 {
-	int i, x, y;
+	int i;
 	int s[VECTORSIZE];
-	VetSmallInt siv;
+	VetSmallInt v_shifted;
 	
 	for (i=0; i<VECTORSIZE; i++)
 	{
-		x = getCastedToInt(v,i);
-		y = x << n;
-		s[i] = y;
+		s[i] = getCastedToInt(v,i) << n;
 	}
 	
-	siv = vs_new(s);
-	cleanOverflow(&siv);
+	v_shifted = vs_new(s);
+	cleanOverflow(&v_shifted);
 	
-	return siv;
+	return v_shifted;
 }
 
 // é o unico shift que da problema, pq o operador de shift >> funciona como aritmetico para signeds
 VetSmallInt vs_shr(VetSmallInt v, int n)
 {
-	int i, x, y;
+	int i, x;
 	int s[VECTORSIZE];
-	VetSmallInt siv;
+	VetSmallInt v_shifted;
 	
 	for (i=0; i<VECTORSIZE; i++)
-	{
-		x = getCastedToInt(v,i);
-		x = x & 0x3F;	// preenche tudo a esquerda do sexto bit com False (nao altera nada nos positivos)
-		y = x >> n;
-		s[i] = y;
+	{	// a mascara 0x3F preenche tudo a esquerda do sexto bit com False (nao altera nada nos positivos)
+		s[i] = (getCastedToInt(v,i) & 0x3F) >> n;
 	}
 	
-	siv = vs_new(s);
-	cleanOverflow(&siv);
+	v_shifted = vs_new(s);
+	cleanOverflow(&v_shifted);
 	
-	return siv;
+	return v_shifted;
 }
 
 VetSmallInt vs_sar(VetSmallInt v, int n)
 {
-	int i, x, y;
-	int v[VECTORSIZE];
-	VetSmallInt siv;
+	int i, x;
+	int s[VECTORSIZE];
+	VetSmallInt v_shifted;
 	
 	for (i=0; i<VECTORSIZE; i++)
 	{
-		x = getCastedToInt(v,i);
-		y = x >> n; // ja faz shift arimetico por padrao, pq x é signed
-		v[i] = y;
+		s[i] = getCastedToInt(v,i) >> n; // ja faz shift arimetico por padrao, pq x é signed 
 	}
 	
-	siv = vs_new(v);
-	cleanOverflow(&siv);
+	v_shifted = vs_new(s);
+	cleanOverflow(&v_shifted);
 	
-	return siv;
+	return v_shifted;
 
 }
 
