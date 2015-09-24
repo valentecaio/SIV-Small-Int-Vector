@@ -28,7 +28,7 @@ int bitOfComplementoA2 (int i) {
 void setOverflow (int index, int status, VetSmallInt *v) {
 	int overflowInbinary;
 	overflowInbinary = 1<<bitOfOverflow(index); // gera um numero binario com apenas um bit true (igual a 1)
-	if (status == true) {
+	if (status) {
 		*v = (*v | overflowInbinary);
 	} else {
 		overflowInbinary = ~overflowInbinary;	// inverte os bits
@@ -43,10 +43,10 @@ void cleanOverflow (VetSmallInt *a) {
 
 // zera os 6 bits de um determinado indice do SIV
 void deleteFromSmallVector (VetSmallInt *v, int index) {
-	int filter = 0xFFFFFFC0;		// 0b 1100 0000
+	int filter = 0xFFFFFFC0;			// 0b 1100 0000
 	while (index) {
-		filter = filter<<SMALLINTBITS; 		// empurra 6 bits pra esquerda
-		filter = filter | 0x3F		// preenche os 6 primeiros bits com true
+		filter = filter<<SMALLINTBITS;	// empurra 6 bits pra esquerda
+		filter = filter | 0x3F;			// preenche os 6 primeiros bits com true
 		index--;
 	}
 	*v = *v & filter;
@@ -59,13 +59,15 @@ void pushToSmallIntVector (int index, int x, VetSmallInt *v) {
 	setOverflow(index, overflow(x), v);
 
 	// trunca o valor caso haja overflow
-	x = (x & 0x3F); // 0x3F é uma mascara que zera tudo a partir do bit 6
+	x = (x & 0x3F);
 
+	// anda com o x o numero de bits do index
+	x = x << index*SMALLINTBITS;
+	
 	// apaga o inteiro antigo antes de colocar o novo
 	deleteFromSmallVector (v, index);
-	
-	// anda com o x o numero de bits do index
-	x << index*SMALLINTBITS;
+
+	// faz o push
 	*v = (*v | x);
 }
 
@@ -146,7 +148,7 @@ VetSmallInt vs_shl(VetSmallInt v, int n)
 // é o unico shift que da problema, pq o operador de shift >> funciona como aritmetico para signeds
 VetSmallInt vs_shr(VetSmallInt v, int n)
 {
-	int i, x;
+	int i;
 	int s[VECTORSIZE];
 	VetSmallInt v_shifted;
 	
