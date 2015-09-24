@@ -53,7 +53,7 @@ void deleteFromSmallVector (VetSmallInt *v, int index) {
 }
 
 // coloca um inteiro x em uma entrada index do VetSmallInt 
-void pushToSmallIntVector (int index, int x, VetSmallInt *v) {
+void vs_push (int index, int x, VetSmallInt *v) {
 
 	// configura os overflow nos bits 28 a 31
 	setOverflow(index, overflow(x), v);
@@ -72,9 +72,9 @@ void pushToSmallIntVector (int index, int x, VetSmallInt *v) {
 }
 
 // pega o small int do indice index e devolve como signed int
-int getCastedToInt (VetSmallInt v, int index) {
+int vs_pull (VetSmallInt *v, int index) {
 	int x,negative;
-	x = v >> (index*SMALLINTBITS);		// empurra o vetor para a direita ate os bits desejados ficarem nas primeiras posicoes
+	x = *v >> (index*SMALLINTBITS);		// empurra o vetor para a direita ate os bits desejados ficarem nas primeiras posicoes
 	x = x & 0x3f;			// filtra o valor apagando todo o resto
 	
 	negative = x & 0x20;	// 0x20 === 0b 0010 0000
@@ -91,7 +91,7 @@ VetSmallInt vs_new(int val[]) {
 	// converte os inteiros e os coloca no SIV
 	// essa parte ta errada pq nao ta considerando o complemento a 2
 	for (i=0; i<VECTORSIZE; i++)
-		pushToSmallIntVector (i, val[i], &siv);
+		vs_push (i, val[i], &siv);
 	
 	return siv;
 }
@@ -108,7 +108,7 @@ void vs_print(VetSmallInt v) {
 	}
 	printf ("\nValores: ");
 	for (i=0; i<VECTORSIZE; i++) {
-		x = getCastedToInt (v, i);
+		x = vs_pull (v, i);
 		printf("\t%d (%02x)", x, x);
 	}
 	printf ("\n\n");
@@ -122,7 +122,7 @@ VetSmallInt vs_add(VetSmallInt v1, VetSmallInt v2)
 	
 	for (i=0; i<VECTORSIZE; i++) 
 	{
-		v[i] = getCastedToInt (v1,i) + getCastedToInt (v2,i);
+		v[i] = vs_pull (v1,i) + vs_pull (v2,i);
 	}
 	
 	v_add = vs_new(v);
@@ -137,7 +137,7 @@ VetSmallInt vs_shl(VetSmallInt v, int n)
 	
 	for (i=0; i<VECTORSIZE; i++)
 	{
-		s[i] = getCastedToInt(v,i) << n;
+		s[i] = vs_pull(v,i) << n;
 	}
 	
 	v_shifted = vs_new(s);
@@ -155,7 +155,7 @@ VetSmallInt vs_shr(VetSmallInt v, int n)
 	
 	for (i=0; i<VECTORSIZE; i++)
 	{	// a mascara 0x3F preenche tudo a esquerda do sexto bit com False (nao altera nada nos positivos)
-		s[i] = (getCastedToInt(v,i) & 0x3F) >> n;
+		s[i] = (vs_pull(v,i) & 0x3F) >> n;
 	}
 	
 	v_shifted = vs_new(s);
@@ -172,7 +172,7 @@ VetSmallInt vs_sar(VetSmallInt v, int n)
 	
 	for (i=0; i<VECTORSIZE; i++)
 	{
-		s[i] = getCastedToInt(v,i) >> n; // ja faz shift arimetico por padrao, pq x é signed 
+		s[i] = vs_pull(v,i) >> n; // ja faz shift arimetico por padrao, pq x é signed 
 	}
 	
 	v_shifted = vs_new(s);
