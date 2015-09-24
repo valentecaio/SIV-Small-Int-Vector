@@ -4,23 +4,24 @@
 #include "smallint.h"
 #include <stdio.h>
 #include <math.h>
-#define FLOWSIZE 32 // 2^5 é o modulo maximo pra 6 bits signed
+#define TOTALSIZE 32 // 2^5 é o modulo maximo pra 6 bits signed
 #define VECTORSIZE 4
+#define SMALLINTBITS 6
 typedef unsigned VetSmallInt;
 
 // verifica se um inteiro vai truncar na conversao e retorna 1 se sim
 int overflow (int a) {
-	return ( a>(FLOWSIZE-1) || a< -FLOWSIZE )
+	return ( a>(TOTALSIZE-1) || a< -TOTALSIZE )
 }
 
 // retorna o bit do respectivo overflow de um small-int em determinado indice
 int bitOfOverflow (int i) {
-	return (FLOWSIZE- VECTORSIZE) +i;
+	return (TOTALSIZE- VECTORSIZE) +i;
 }
 
 // retorna o bit do respectivo complemento a2 de um small-int em determinado indice
 int bitOfComplementoA2 (int i) {
-	return 5+(i*6);
+	return (SMALLINTBITS-1)+(i*SMALLINTBITS);
 }
 
 // coloca o boolean de overflow de um determinado indice do vetor no respectivo bit do SIV
@@ -44,7 +45,7 @@ void cleanOverflow (VetSmallInt *a) {
 void deleteFromSmallVector (VetSmallInt *v, int index) {
 	int filter = 0xFFFFFFC0;		// 0b 1100 0000
 	while (index) {
-		filter = filter<<6; 		// empurra 6 bits pra esquerda
+		filter = filter<<SMALLINTBITS; 		// empurra 6 bits pra esquerda
 		filter = filter | 0x3F		// preenche os 6 primeiros bits com true
 		index--;
 	}
@@ -64,8 +65,21 @@ void pushToSmallIntVector (int index, int x, VetSmallInt *v) {
 	deleteFromSmallVector (v, index);
 	
 	// anda com o x o numero de bits do index
-	x << index*6;
+	x << index*SMALLINTBITS;
 	*v = (*v | x);
+}
+
+// pega o small int do indice index e devolve como signed int
+int getCastedToInt (VetSmallInt v, int index) {
+	int x,negative;
+	x = v >> (index*SMALLINTBITS);		// empurra o vetor para a direita ate os bits desejados ficarem nas primeiras posicoes
+	x = x & 0x3f;			// filtra o valor apagando todo o resto
+	
+	negative = x & 0x20;	// 0x20 === 0b 0010 0000
+	if (negative) {			// 0xFFFFFFb0 é a mascara que preenche todos os bits com true a partir do 6 (a contar da direita pra esquerda)
+		x |= 0xFFFFFFb0;	// preenche os bits a esquerda do numero com true
+	}
+	return x;
 }
 
 VetSmallInt vs_new(int val[]) {
@@ -83,23 +97,10 @@ VetSmallInt vs_new(int val[]) {
 	return siv;
 }
 
-// pega o small int do indice index e devolve como signed int
-int getCastedToInt (VetSmallInt v, int index) {
-	int x,negative;
-	x = v >> (index*6);		// empurra o vetor para a direita ate os bits desejados ficarem nas primeiras posicoes
-	x = x & 0x3f;			// filtra o valor apagando todo o resto
-	
-	negative = x & 0x20;	// 0x20 === 0b 0010 0000
-	if (negative) {			// 0xFFFFFFb0 é a mascara que preenche todos os bits com true a partir do 6 (a contar da direita pra esquerda)
-		x |= 0xFFFFFFb0;	// preenche os bits a esquerda do numero com true
-	}
-	return x;
-}
-
 void vs_print(VetSmallInt v) {
 	int i,x;
 	printf ("\n\nOverflow: ");
-	for (i=28; i<31; i++) {
+	for (i=TOTALSIZE-VECTORSIZE; i<TOTALSIZE; i++) {
 		if (1<<i & v) {	// vai ser true somente se o bit i do vetor v for true
 			printf ("\tsim");
 		} else {
