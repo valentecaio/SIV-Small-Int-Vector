@@ -25,5 +25,17 @@ int main (void) {
 	v = vs_add(vs_new(a), vs_new(a));
 	vs_print(v);
 	
+	printf ("\n\n------TESTE DE SHIFT PARA ESQUERDA------\n\n");
+	v = vs_shl(vs_new(a), 1);
+	vs_print(v);
+	
+	printf ("\n\n------TESTE DE SHIFT ARITMETICO------\n\n");
+	v = vs_sar(vs_new(a), 1);
+	vs_print(v);
+	
+	printf ("\n\n------TESTE DE SHIFT LOGICO------\n\n");
+	v = vs_shr(vs_new(a), 1);
+	vs_print(v);
+		
 	return 0;
 }
