@@ -1,4 +1,3 @@
-
 #include "smallint.h"
 #define VECTORSIZE 4
 void printa_vetor (int *a, int n) {

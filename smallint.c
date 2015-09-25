@@ -21,7 +21,7 @@ void printInBinary (int n) {
 // serve para generalizar o codigo e evitar muitas comparações no if da printVectorInBinary
 int isLastBitOfAnyIndex(int i) {
 		int j;
-		for (j=1, j<=VECTORSIZE; j++) {
+		for (j=1; j<=VECTORSIZE; j++) {
 			if ((j*SMALLINTBITS)==i) {
 				return 1;
 			}
