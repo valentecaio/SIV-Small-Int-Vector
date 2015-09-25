@@ -18,11 +18,22 @@ void printInBinary (int n) {
 	}
 }
 
+// serve para generalizar o codigo e evitar muitas comparações no if da printVectorInBinary
+int isLastBitOfAnyIndex(int i) {
+		int j;
+		for (j=1, j<=VECTORSIZE; j++) {
+			if ((j*SMALLINTBITS)==i) {
+				return 1;
+			}
+		}
+		return 0;
+}
+
 void printVectorInBinary (int n) {
 	int i;
 	for (i=31; i>=0; i--){
 		printf("%d", (n >> i) & 1);
-		if (i==SMALLINTBITS || i==2*SMALLINTBITS || i==3*SMALLINTBITS || i==4*SMALLINTBITS || i==TOTALSIZE-VECTORSIZE) {
+		if (isLastBitOfAnyIndex(i) || i==TOTALSIZE-VECTORSIZE) {
 			printf (" ");
 		}
 	}
