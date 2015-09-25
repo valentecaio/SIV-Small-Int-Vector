@@ -84,8 +84,8 @@ void setOverflow (int index, int status, VetSmallInt *v) {
 
 // preenche os bits 28 a 31 com zeros (e nao altera os outros)
 void cleanOverflow (VetSmallInt *a) {
-	int mask = ~0, i=TOTALSIZE-1;		// ~0 === 0xFFFFFFFF
-	while (i>=TOTALSIZE-VECTORSIZE) {	// TODO: pensar em um jeito melhor de gerar a mascara
+	int i, mask = ~0;		// ~0 === 0xFFFFFFFF
+	for (i = TOTALSIZE-1; i>=TOTALSIZE-VECTORSIZE; i--) {	// TODO: pensar em um jeito melhor de gerar a mascara
 		mask = mask & ~(1<<i);
 	}
 	*a = (*a & mask);					// para 4 indices, mask = 0x0FFFFFFF 
@@ -202,7 +202,7 @@ VetSmallInt vs_shr(VetSmallInt v, int n)
 	
 	for (i=0; i<VECTORSIZE; i++)
 	{	// a mascara 0x3F preenche tudo a esquerda do sexto bit com False (nao altera nada nos positivos)
-		s[i] = (vs_get(&v,i) & maskFirstIndex() >> n);
+		s[i] = ( (vs_get(&v,i) & maskFirstIndex() ) >> n);
 	}
 	
 	v_shifted = vs_new(s);
