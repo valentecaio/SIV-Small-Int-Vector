@@ -5,7 +5,8 @@ void printa_vetor (int *a, int n) {
 	int i;
 	printf ("\nExibindo dados do vetor de inteiros:\n");
 	for (i=0; i<n; i++) {
-		printf ("\nentrada %d \t valor: %d", i, a[i]);
+		printf ("\nentrada %d \t valor: %d\tbinario: ", i, a[i]);
+		printInBinary(a[i]);
 	}
 	printf ("\n");
 }
