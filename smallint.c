@@ -21,9 +21,10 @@ void printInBinary (int n) {
 void printVectorInBinary (int n) {
 	int i;
 	for (i=31; i>=0; i--){
-		if (i==5 || i==11 || i==17 || i==23 || i==27)
-			printf (" ");
 		printf("%d", (n >> i) & 1);
+		if (i==SMALLINTBITS || i==2*SMALLINTBITS || i==3*SMALLINTBITS || i==4*SMALLINTBITS || i==TOTALSIZE-VECTORSIZE) {
+			printf (" ");
+		}
 	}
 }
 
@@ -102,7 +103,7 @@ int vs_get (VetSmallInt *v, int index) {
 	
 	negative = x & 0x20;	// 0x20 === 0b 0010 0000
 	if (negative) {			// 0xFFFFFFb0 é a mascara que preenche todos os bits com true a partir do 6 (a contar da direita pra esquerda)
-		x |= 0xFFFFFFc0;	// preenche os bits a esquerda do numero com true
+		x |= 0xFFFFFFc0;	// 0xFFFFFFc0 === -0b 1100 0000
 	}
 	
 	return x;
