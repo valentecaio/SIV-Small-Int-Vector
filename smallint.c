@@ -9,6 +9,15 @@
 #define SMALLINTBITS 6
 typedef unsigned VetSmallInt;
 
+
+int maskFirstIndex() { 	
+	return ~(~0 << SMALLINTBITS);	// ~(~0 << SMALLINTBITS) equivale a 0x3F para 4 indices
+}
+
+int smallIntIsNegative(int x) {
+	return x & ( 1<<(SMALLINTBITS-1) );	// 0x20 === 0b 0010 0000
+}
+
 void printInBinary (int n) {
 	int i;
 	for (i=31; i>=0; i--){
@@ -75,16 +84,21 @@ void setOverflow (int index, int status, VetSmallInt *v) {
 
 // preenche os bits 28 a 31 com zeros (e nao altera os outros)
 void cleanOverflow (VetSmallInt *a) {
-	*a = (*a & 0x0FFFFFFF);	
+	int mask = ~0, i=TOTALSIZE-1;		// ~0 === 0xFFFFFFFF
+	while (i>=TOTALSIZE-VECTORSIZE) {	// TODO: pensar em um jeito melhor de gerar a mascara
+		mask = mask & ~(1<<i);
+	}
+	*a = (*a & mask);					// para 4 indices, mask = 0x0FFFFFFF 
 }
 
 /* essa função eh desnecessaria pq podemos usar a vs_set passando zero
+// ficou salva para efeitos de documentacao
 // zera os 6 bits de um determinado indice do SIV
 void vs_remove (VetSmallInt *v, int index) {
-	int filter = 0xFFFFFFC0;			// 0b 1100 0000
+	int filter = ~maskFirstIndex();			// -0b 1100 0000
 	while (index) {
-		filter = filter<<SMALLINTBITS;	// empurra 6 bits pra esquerda
-		filter = filter | 0x3F;			// preenche os 6 primeiros bits com true
+		filter = filter<<SMALLINTBITS;	// empurra bits pra esquerda
+		filter = filter | maskFirstIndex();			// preenche os primeiros bits com true
 		index--;
 	}
 	*v = *v & filter;
@@ -97,7 +111,7 @@ void vs_set (int index, int x, VetSmallInt *v) {
 	setOverflow(index, overflow(x), v);
 
 	// trunca o valor caso haja overflow
-	x = (x & 0x3F);
+	x = (x & maskFirstIndex());	
 
 	// anda com o x o numero de bits do index
 	x = x << (index*SMALLINTBITS);
@@ -108,13 +122,12 @@ void vs_set (int index, int x, VetSmallInt *v) {
 
 // pega o small int do indice index e devolve como signed int
 int vs_get (VetSmallInt *v, int index) {
-	int x,negative;
-	x = *v >> (index*SMALLINTBITS);		// empurra o vetor para a direita ate os bits desejados ficarem nas primeiras posicoes
-	x = x & 0x3f;			// filtra o valor apagando todo o resto
+	int x;
+	x = *v >> (index*SMALLINTBITS);	// empurra o vetor para a direita ate os bits desejados ficarem nas primeiras posicoes
+	x = x & maskFirstIndex();		// filtra o valor apagando todo o resto
 	
-	negative = x & 0x20;	// 0x20 === 0b 0010 0000
-	if (negative) {			// 0xFFFFFFb0 é a mascara que preenche todos os bits com true a partir do 6 (a contar da direita pra esquerda)
-		x |= 0xFFFFFFc0;	// 0xFFFFFFc0 === -0b 1100 0000
+	if (smallIntIsNegative(x)) {
+		x |= ~maskFirstIndex();		//  (~0 << SMALLINTBITS) === 0xFFFFFFc0 === -0b 1100 0000
 	}
 	
 	return x;
@@ -125,7 +138,6 @@ VetSmallInt vs_new(int val[]) {
 	VetSmallInt siv=0; // IMPORTANTE INICIALIZAR COM ZERO PRA APAGAR O LIXO
 		
 	// converte os inteiros e os coloca no SIV
-	// essa parte ta errada pq nao ta considerando o complemento a 2
 	for (i=0; i<VECTORSIZE; i++)
 		vs_set (i, val[i], &siv);
 	printf ("\nresultado do set: ");
@@ -154,8 +166,7 @@ void vs_print(VetSmallInt v) {
 
 VetSmallInt vs_add(VetSmallInt v1, VetSmallInt v2)
 {
-	int i;
-	int v[VECTORSIZE];
+	int i, v[VECTORSIZE];
 	VetSmallInt v_add;
 	
 	for (i=0; i<VECTORSIZE; i++) 
@@ -169,8 +180,7 @@ VetSmallInt vs_add(VetSmallInt v1, VetSmallInt v2)
 
 VetSmallInt vs_shl(VetSmallInt v, int n)
 {
-	int i;
-	int s[VECTORSIZE];
+	int i, s[VECTORSIZE];
 	VetSmallInt v_shifted;
 	
 	for (i=0; i<VECTORSIZE; i++)
@@ -187,13 +197,12 @@ VetSmallInt vs_shl(VetSmallInt v, int n)
 // é o unico shift que da problema, pq o operador de shift >> funciona como aritmetico para signeds
 VetSmallInt vs_shr(VetSmallInt v, int n)
 {
-	int i;
-	int s[VECTORSIZE];
+	int i, s[VECTORSIZE];
 	VetSmallInt v_shifted;
 	
 	for (i=0; i<VECTORSIZE; i++)
 	{	// a mascara 0x3F preenche tudo a esquerda do sexto bit com False (nao altera nada nos positivos)
-		s[i] = (vs_get(&v,i) & 0x3F) >> n;
+		s[i] = (vs_get(&v,i) & maskFirstIndex() >> n);
 	}
 	
 	v_shifted = vs_new(s);
@@ -204,8 +213,7 @@ VetSmallInt vs_shr(VetSmallInt v, int n)
 
 VetSmallInt vs_sar(VetSmallInt v, int n)
 {
-	int i;
-	int s[VECTORSIZE];
+	int i, s[VECTORSIZE];
 	VetSmallInt v_shifted;
 	
 	for (i=0; i<VECTORSIZE; i++)
