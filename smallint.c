@@ -6,7 +6,7 @@
 #include <math.h>
 #define TOTALSIZE 32 // 2^5 é o modulo maximo pra 6 bits signed
 #define VECTORSIZE 4
-#define SMALLINTBITS 6
+#define SMALLINTBITS 7
 typedef unsigned VetSmallInt;
 
 
@@ -84,11 +84,8 @@ void setOverflow (int index, int status, VetSmallInt *v) {
 
 // preenche os bits 28 a 31 com zeros (e nao altera os outros)
 void cleanOverflow (VetSmallInt *a) {
-	int i, mask = ~0;		// ~0 === 0xFFFFFFFF
-	for (i = TOTALSIZE-1; i>=TOTALSIZE-VECTORSIZE; i--) {	// TODO: pensar em um jeito melhor de gerar a mascara
-		mask = mask & ~(1<<i);
-	}
-	*a = (*a & mask);					// para 4 indices, mask = 0x0FFFFFFF 
+	int mask = ((unsigned)-1) >> VECTORSIZE;
+	*a = (*a & mask);	// para 4 indices, mask = 0x0FFFFFFF 
 }
 
 /* essa função eh desnecessaria pq podemos usar a vs_set passando zero
@@ -164,13 +161,11 @@ void vs_print(VetSmallInt v) {
 	printf ("\n\n");
 }
 
-VetSmallInt vs_add(VetSmallInt v1, VetSmallInt v2)
-{
+VetSmallInt vs_add(VetSmallInt v1, VetSmallInt v2) {
 	int i, v[VECTORSIZE];
 	VetSmallInt v_add;
 	
-	for (i=0; i<VECTORSIZE; i++) 
-	{
+	for (i=0; i<VECTORSIZE; i++) {
 		v[i] = vs_get (&v1,i) + vs_get (&v2,i);
 	}
 	
@@ -178,13 +173,11 @@ VetSmallInt vs_add(VetSmallInt v1, VetSmallInt v2)
 	return v_add;
 }
 
-VetSmallInt vs_shl(VetSmallInt v, int n)
-{
+VetSmallInt vs_shl(VetSmallInt v, int n) {
 	int i, s[VECTORSIZE];
 	VetSmallInt v_shifted;
 	
-	for (i=0; i<VECTORSIZE; i++)
-	{
+	for (i=0; i<VECTORSIZE; i++){
 		s[i] = vs_get(&v,i) << n;
 	}
 	
@@ -195,13 +188,11 @@ VetSmallInt vs_shl(VetSmallInt v, int n)
 }
 
 // é o unico shift que da problema, pq o operador de shift >> funciona como aritmetico para signeds
-VetSmallInt vs_shr(VetSmallInt v, int n)
-{
+VetSmallInt vs_shr(VetSmallInt v, int n) {
 	int i, s[VECTORSIZE];
 	VetSmallInt v_shifted;
 	
-	for (i=0; i<VECTORSIZE; i++)
-	{	// a mascara 0x3F preenche tudo a esquerda do sexto bit com False (nao altera nada nos positivos)
+	for (i=0; i<VECTORSIZE; i++){	// a mascara nao altera nada nos positivos
 		s[i] = ( (vs_get(&v,i) & maskFirstIndex() ) >> n);
 	}
 	
@@ -211,13 +202,11 @@ VetSmallInt vs_shr(VetSmallInt v, int n)
 	return v_shifted;
 }
 
-VetSmallInt vs_sar(VetSmallInt v, int n)
-{
+VetSmallInt vs_sar(VetSmallInt v, int n) {
 	int i, s[VECTORSIZE];
 	VetSmallInt v_shifted;
 	
-	for (i=0; i<VECTORSIZE; i++)
-	{
+	for (i=0; i<VECTORSIZE; i++){
 		s[i] = vs_get(&v,i) >> n; // ja faz shift arimetico por padrao, pq x é signed 
 	}
 	
