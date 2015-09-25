@@ -42,13 +42,11 @@ int overflow (int a) {
 // retorna o bit do respectivo overflow de um small-int em determinado indice
 int bitOfOverflow (int i) {
 	return (TOTALSIZE - VECTORSIZE) +i;
-	//return (TOTALSIZE - VECTORSIZE) +1 +i;
 }
 
 // retorna o bit do respectivo complemento a2 de um small-int em determinado indice
 int bitOfComplementoA2 (int i) {
 	return (SMALLINTBITS-1) + (i*SMALLINTBITS);
-	//return (i+1) * SMALLINTBITS;
 }
 
 // coloca o boolean de overflow de um determinado indice do vetor no respectivo bit do SIV
@@ -104,8 +102,9 @@ int vs_get (VetSmallInt *v, int index) {
 	
 	negative = x & 0x20;	// 0x20 === 0b 0010 0000
 	if (negative) {			// 0xFFFFFFb0 é a mascara que preenche todos os bits com true a partir do 6 (a contar da direita pra esquerda)
-		x |= 0xFFFFFFb0;	// preenche os bits a esquerda do numero com true
+		x |= 0xFFFFFFc0;	// preenche os bits a esquerda do numero com true
 	}
+	
 	return x;
 }
 
