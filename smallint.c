@@ -9,6 +9,10 @@
 #define SMALLINTBITS 6	// numero de bits de cada entrada do SIV
 typedef unsigned VetSmallInt;
 
+typedef union {
+	char character[TOTALSIZE/8];
+	VetSmallInt inteiro;
+} VetSmallIntUnion;
 
 int maskFirstIndex() { 	
 	return ~(~0 << SMALLINTBITS);	// ~(~0 << SMALLINTBITS) equivale a 0x3F para 4 indices
@@ -208,8 +212,8 @@ VetSmallInt vs_sar(VetSmallInt v, int n) {
 	return v_shifted;
 
 }
-
-int vs_writeInBinary(VetSmallInt v, FILE *f) {
+/*
+int vs_writeStringInBinary(VetSmallInt v, FILE *f) {
 	int i;
 	for (i=TOTALSIZE; i>=0; i--){
 		if (fprintf(f, "%d", (v >> i) & 1) < 0) {
@@ -219,15 +223,51 @@ int vs_writeInBinary(VetSmallInt v, FILE *f) {
 	return 0;
 }
 
-int vs_write(VetSmallInt v, FILE *f) {
-	if (fprintf(f, "%u", v) < 0) {
+int vs_writeString(VetSmallInt v, FILE *f) {
+	if (fprintf(f, "%u", v) != 0) {
 		return -1;
 	}
 	return 0;
 }
-/*
+
+VetSmallInt vs_readString(FILE *f) {
+	int x;
+	VetSmallInt a;
+	if (fscanf(f, "%u", &a) != 0) {
+		return (unsigned)-1;
+	}
+	return a;
+}
+*/
+
+int vs_write(VetSmallInt v, FILE *f) {
+	int i, returned_value;
+	VetSmallIntUnion a;
+	a.inteiro = v;
+	for (i=3; i>=0; i--) { // inverte para colocar em big-endian
+		returned_value = fputc(a.character[i], f);
+		if (returned_value == EOF){
+			return -1;
+		}
+		/*if (returned_value != written) { // de acordo com o man do fputc, isso deveria funcionar, mas nao funcionou
+			return -1;
+		}*/
+	}
+	return 0;
+}
+
 VetSmallInt vs_read(FILE *f) {
-	
-	
-	
-}*/
+	int i, returned_value;
+	VetSmallIntUnion a;
+	for (i=3; i>=0; i--) { // inverte para colocar de volta em little-endian
+		returned_value = fgetc(f);
+		if (returned_value == EOF) {
+			return -1;
+		}
+		a.character[i] = returned_value;
+	}
+	if (fgetc(f) != EOF){ // se o arquivo tiver mais de 4 bytes é porque está errado
+		return -1;
+	}
+	return a.inteiro;
+}

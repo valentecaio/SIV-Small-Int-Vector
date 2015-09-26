@@ -71,38 +71,71 @@ int main (void) {
 	printf ("\nvetor shiftado:\t");
 	vs_printInBinary(v);
 	vs_print(v);
+	/*
+	printf ("\n\n------TESTE DE WRITE COMO STRING------\n");
+	f = fopen ("writeStringTest.txt", "w");
+	v = vs_new(a);
+	if (vs_writeString(v, f) == 0) {
+		printf ("\nWrite string funcionou!");
+	} else {
+		printf ("\nWrite string NAO funcionou!");
+	}
+	printf ("\nvetor escrito:\t");
+	vs_printInBinary(v);
+	vs_print(v);
+	fclose(f);
 	
-	printf ("\n\n------TESTE DE WRITE------\n");
-	f = fopen ("writeTest.txt", "w");
+	printf ("\n\n------TESTE DE WRITE COMO STRING DO VETOR EM BINARIO------\n");
+	f = fopen ("writeStringInBinaryTest.txt", "w");
+	v = vs_new(a);
+	if (vs_writeStringInBinary(v, f) == 0) {
+		printf ("\nWrite string binario funcionou!");
+	} else {
+		printf ("\nWrite string binario NAO funcionou!");
+	}
+	printf ("\nvetor escrito:\t");
+	vs_printInBinary(v);
+	vs_print(v);
+	fclose(f);
+	*/
+	printf ("\n\n------TESTE DE WRITE COMO BINARIO------\n");
+	f = fopen ("readAndWriteTest", "wb");
+	if (!f){
+		printf("\nopen readAndWriteTest wb falhou");
+	}
 	v = vs_new(a);
 	if (vs_write(v, f) == 0) {
-		printf ("\nWrite funcionou!");
+		printf ("\nWrite funcionou!\nValor escrito: %d (%08x)"
+			"\nResultado do hexdump:\n", v, v);
+		fclose(f);
+		system("hexdump -C readAndWriteTest");
 	} else {
 		printf ("\nWrite NAO funcionou!");
+		fclose(f);
 	}
 	printf ("\nvetor escrito:\t");
 	vs_printInBinary(v);
 	vs_print(v);
-	fclose(f);
 	
-	printf ("\n\n------TESTE DE WRITE BINARIO------\n");
-	f = fopen ("writeInBinaryTest.txt", "w");
-	v = vs_new(a);
-	if (vs_writeInBinary(v, f) == 0) {
-		printf ("\nWrite binario funcionou!");
+	printf ("\n\n------TESTE DE READ COMO BINARIO------\n");
+	f = fopen ("readAndWriteTest", "rb");
+	if (f){
+		v = vs_read(f);
 	} else {
-		printf ("\nWrite binario NAO funcionou!");
+		printf("\nopen readAndWriteTest rb falhou");
+	}
+	if (v != -1) {
+		printf ("\nRead funcionou!\nResultado: %d (%08x)"
+			"\nResultado do hexdump:\n", v, v);
+		system("hexdump -C readAndWriteTest");
+	} else {
+		printf ("\nRead NAO funcionou!");
 	}
 	printf ("\nvetor escrito:\t");
 	vs_printInBinary(v);
 	vs_print(v);
 	fclose(f);
 	
-	/*
-	printf ("\n\n------TESTE DE READ------\n");
-	f = fopen ("readTest.txt", "r");
-	v = vs_shr(vs_new(a), 1);
-	vs_print(v);
-	*/
+	
 	return 0;
 }
