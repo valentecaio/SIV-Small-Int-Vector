@@ -36,4 +36,4 @@ int vs_get (VetSmallInt *v, int index);
 void vs_set (int index, int x, VetSmallInt *v);
 
 /* printa um vetor de small int em binario */
-void vs_printInBinary (int n) 
+void vs_printInBinary (int n); 
