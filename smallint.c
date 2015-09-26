@@ -63,9 +63,10 @@ void setOverflow (int index, int status, VetSmallInt *v) {
 	}
 }
 
-// preenche os bits 28 a 31 com zeros (e nao altera os outros)
-void cleanOverflow (VetSmallInt *a) {
+// preenche os bits de overflow com zeros (e nao altera os outros)
+void cleanOverflow (VetSmallInt *a) { // os dois metodos funcionam, mas o primeiro parece mais eficiente
 	int mask = ((unsigned)-1) >> VECTORSIZE;
+	//int mask = ~( ~0 << (TOTALSIZE-VECTORSIZE) );
 	*a = (*a & mask);	// para 4 indices, mask = 0x0FFFFFFF 
 }
 
@@ -129,8 +130,6 @@ VetSmallInt vs_new(int val[]) {
 	for (i=0; i<VECTORSIZE; i++) {
 		vs_set (i, val[i], &siv);
 	}
-	printf ("\nresultado do set: ");
-	vs_printInBinary(siv);
 	
 	return siv;
 }
@@ -150,6 +149,7 @@ void vs_print(VetSmallInt v) {
 		x = vs_get (&v, i);
 		printf("\t%d (%02x)", x, x);
 	}
+	printf ("\nValor do vetor em unsigned int: %u", v);
 	printf ("\n\n");
 }
 

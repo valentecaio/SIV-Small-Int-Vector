@@ -30,41 +30,71 @@ int main (void) {
 	
 	printf ("\n\n------TESTE DE CRIACAO------\n");
 	v = vs_new(a);
+	printf ("\nvetor criado:\t\t");
+	vs_printInBinary(v);
 	vs_print(v);
 	
 	printf ("\n\n------TESTE DE SOMA------\n");
-	v = vs_add(vs_new(a), vs_new(a));
+	v = vs_new(a);
+	printf ("\nvetor 1:\t");
+	vs_printInBinary(v);
+	printf ("\nvetor 2:\t");
+	vs_printInBinary(v);
+	v = vs_add(v, v);
+	printf ("\nvetor somado:\t");
+	vs_printInBinary(v);
 	vs_print(v);
 	
 	printf ("\n\n------TESTE DE SHIFT PARA ESQUERDA------\n");
-	v = vs_shl(vs_new(a), 1);
+	v = vs_new(a);
+	printf ("\nvetor passado:\t");
+	vs_printInBinary(v);
+	v = vs_shl(v, 1);
+	printf ("\nvetor shiftado:\t");
+	vs_printInBinary(v);
 	vs_print(v);
 	
 	printf ("\n\n------TESTE DE SHIFT ARITMETICO------\n");
-	v = vs_sar(vs_new(a), 1);
+	v = vs_new(a);
+	printf ("\nvetor passado:\t");
+	vs_printInBinary(v);
+	v = vs_sar(v, 1);
+	printf ("\nvetor shiftado:\t");
+	vs_printInBinary(v);
 	vs_print(v);
 	
 	printf ("\n\n------TESTE DE SHIFT LOGICO------\n");
-	v = vs_shr(vs_new(a), 1);
+	v = vs_new(a);
+	printf ("\nvetor passado:\t");
+	vs_printInBinary(v);
+	v = vs_shr(v, 1);
+	printf ("\nvetor shiftado:\t");
+	vs_printInBinary(v);
 	vs_print(v);
 	
 	printf ("\n\n------TESTE DE WRITE------\n");
 	f = fopen ("writeTest.txt", "w");
-	if (vs_write(vs_new(a), f) == 0) {
+	v = vs_new(a);
+	if (vs_write(v, f) == 0) {
 		printf ("\nWrite funcionou!");
 	} else {
 		printf ("\nWrite NAO funcionou!");
 	}
+	printf ("\nvetor escrito:\t");
+	vs_printInBinary(v);
 	vs_print(v);
 	fclose(f);
 	
 	printf ("\n\n------TESTE DE WRITE BINARIO------\n");
 	f = fopen ("writeInBinaryTest.txt", "w");
-	if (vs_writeInBinary(vs_new(a), f) == 0) {
+	v = vs_new(a);
+	if (vs_writeInBinary(v, f) == 0) {
 		printf ("\nWrite binario funcionou!");
 	} else {
 		printf ("\nWrite binario NAO funcionou!");
 	}
+	printf ("\nvetor escrito:\t");
+	vs_printInBinary(v);
 	vs_print(v);
 	fclose(f);
 	
