@@ -14,6 +14,10 @@ typedef union {
 	VetSmallInt inteiro;
 } VetSmallIntUnion;
 
+int invert_index (int i) {
+	return VECTORSIZE-1 -i;
+}
+
 int maskFirstIndex() { 	
 	return ~(~0 << SMALLINTBITS);	// ~(~0 << SMALLINTBITS) equivale a 0x3F para 4 indices
 }
@@ -100,6 +104,9 @@ void vs_printInBinary (int n) {
 
 // coloca um signed int x em uma entrada index do VetSmallInt 
 void vs_set (int index, int x, VetSmallInt *v) {
+
+	index = invert_index(index);
+	
 	// configura os overflow nos bits 28 a 31
 	setOverflow(index, overflow(x), v);
 
@@ -116,6 +123,7 @@ void vs_set (int index, int x, VetSmallInt *v) {
 // pega o small int do indice index e devolve como signed int
 int vs_get (VetSmallInt *v, int index) {
 	int x;
+	index = invert_index(index);
 	x = *v >> (index*SMALLINTBITS);	// empurra o vetor para a direita ate os bits desejados ficarem nas primeiras posicoes
 	x = x & maskFirstIndex();		// filtra o valor apagando todo o resto
 	
