@@ -25,3 +25,15 @@ VetSmallInt vs_read(FILE *f);
 
 /* Grava um vetor de small ints */
 int vs_write(VetSmallInt v, FILE *f);
+
+/* Grava um vetor de small ints em binario */
+int vs_writeInBinary(VetSmallInt v, FILE *f);
+
+/* pega o small int do indice index e devolve como signed int */
+int vs_get (VetSmallInt *v, int index);
+
+/* coloca um signed int x em uma entrada index do VetSmallInt */
+void vs_set (int index, int x, VetSmallInt *v);
+
+/* printa um vetor de small int em binario */
+void vs_printInBinary (int n) 
