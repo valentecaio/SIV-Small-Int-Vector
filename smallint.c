@@ -4,9 +4,9 @@
 #include "smallint.h"
 #include <stdio.h>
 #include <math.h>
-#define TOTALSIZE 32 // 2^5 é o modulo maximo pra 6 bits signed
-#define VECTORSIZE 4
-#define SMALLINTBITS 7
+#define TOTALSIZE 32	// numero maximo de bits em um SIV
+#define VECTORSIZE 4	// numero de indices do SIV
+#define SMALLINTBITS 6	// numero de bits de cada entrada do SIV
 typedef unsigned VetSmallInt;
 
 
@@ -18,16 +18,7 @@ int smallIntIsNegative(int x) {
 	return x & ( 1<<(SMALLINTBITS-1) );	// 0x20 === 0b 0010 0000
 }
 
-void printInBinary (int n) {
-	int i;
-	for (i=31; i>=0; i--){
-		if (!( (i+1)%4 ))
-			printf (" ");
-		printf("%d", (n >> i) & 1);
-	}
-}
-
-// serve para generalizar o codigo e evitar muitas comparações no if da printVectorInBinary
+// serve para generalizar o codigo e evitar muitas comparações no if da vs_printInBinary
 int isLastBitOfAnyIndex(int i) {
 		int j;
 		for (j=1; j<=VECTORSIZE; j++) {
@@ -38,19 +29,9 @@ int isLastBitOfAnyIndex(int i) {
 		return 0;
 }
 
-void printVectorInBinary (int n) {
-	int i;
-	for (i=31; i>=0; i--){
-		printf("%d", (n >> i) & 1);
-		if (isLastBitOfAnyIndex(i) || i==TOTALSIZE-VECTORSIZE) {
-			printf (" ");
-		}
-	}
-}
-
-void printInBinaryRecursive (int n) {
+void printIntInBinaryRecursive (int n) {
 	if (n>0) {
-		printInBinaryRecursive (n/2); // chama outra instância da mesma funcao passando n/2
+		printIntInBinaryRecursive (n/2); // chama outra instância da mesma funcao passando n/2
 		printf ("%d", n%2);
 	}
 }
@@ -102,7 +83,17 @@ void vs_remove (VetSmallInt *v, int index) {
 }
 */
 
-// coloca um inteiro x em uma entrada index do VetSmallInt 
+void vs_printInBinary (int n) {
+	int i;
+	for (i=TOTALSIZE-1; i>=0; i--){
+		printf("%d", (n >> i) & 1);
+		if (isLastBitOfAnyIndex(i) || i==TOTALSIZE-VECTORSIZE) {
+			printf (" ");
+		}
+	}
+}
+
+// coloca um signed int x em uma entrada index do VetSmallInt 
 void vs_set (int index, int x, VetSmallInt *v) {
 	// configura os overflow nos bits 28 a 31
 	setOverflow(index, overflow(x), v);
@@ -132,13 +123,14 @@ int vs_get (VetSmallInt *v, int index) {
 
 VetSmallInt vs_new(int val[]) {
 	int i;
-	VetSmallInt siv=0; // IMPORTANTE INICIALIZAR COM ZERO PRA APAGAR O LIXO
+	VetSmallInt siv = 0; // IMPORTANTE INICIALIZAR COM ZERO PRA APAGAR O LIXO
 		
 	// converte os inteiros e os coloca no SIV
-	for (i=0; i<VECTORSIZE; i++)
+	for (i=0; i<VECTORSIZE; i++) {
 		vs_set (i, val[i], &siv);
+	}
 	printf ("\nresultado do set: ");
-	printVectorInBinary(siv);
+	vs_printInBinary(siv);
 	
 	return siv;
 }
@@ -217,3 +209,25 @@ VetSmallInt vs_sar(VetSmallInt v, int n) {
 
 }
 
+int vs_writeInBinary(VetSmallInt v, FILE *f) {
+	int i;
+	for (i=TOTALSIZE; i>=0; i--){
+		if (fprintf(f, "%d", (v >> i) & 1) < 0) {
+			return -1;
+		}
+	}
+	return 0;
+}
+
+int vs_write(VetSmallInt v, FILE *f) {
+	if (fprintf(f, "%u", v) < 0) {
+		return -1;
+	}
+	return 0;
+}
+/*
+VetSmallInt vs_read(FILE *f) {
+	
+	
+	
+}*/
