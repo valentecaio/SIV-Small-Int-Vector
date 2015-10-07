@@ -159,7 +159,7 @@ void vs_print(VetSmallInt v) {
 	printf ("\nValores: ");
 	for (i=0; i<VECTORSIZE; i++) {
 		x = vs_get (&v, i);
-		printf("\t%d (%02x)", x, x);
+		printf("\t%d (%02x)", x, x&maskFirstIndex());
 	}
 	printf ("\nValor do vetor em unsigned int: %u", v);
 	printf ("\n\n");
@@ -273,9 +273,6 @@ VetSmallInt vs_read(FILE *f) {
 			return -1;
 		}
 		a.character[i] = returned_value;
-	}
-	if (fgetc(f) != EOF){ // se o arquivo tiver mais de 4 bytes é porque está errado
-		return -1;
 	}
 	return a.inteiro;
 }
